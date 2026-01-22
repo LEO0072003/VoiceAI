@@ -1,6 +1,6 @@
 #######################################
 # VoiceAI - Complete Production Stack
-# Single configuration for full deployment
+# All env variables read from .env file
 #######################################
 
 services:
@@ -11,14 +11,12 @@ services:
     image: postgres:16-alpine
     container_name: voiceai-postgres
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-voiceai}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voiceai123}
-      POSTGRES_DB: ${POSTGRES_DB:-voiceai_db}
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voiceai}"]
+      test: ["CMD-SHELL", "pg_isready -U voiceai"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -52,16 +50,8 @@ services:
       dockerfile: Dockerfile
     container_name: voiceai-backend
     restart: unless-stopped
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-voiceai}:${POSTGRES_PASSWORD:-voiceai123}@postgres:5432/${POSTGRES_DB:-voiceai_db}
-      - REDIS_URL=redis://redis:6379
-      - GROQ_API_KEY=${GROQ_API_KEY}
-      - TAVUS_API_KEY=${TAVUS_API_KEY}
-      - TAVUS_REPLICA_ID=${TAVUS_REPLICA_ID}
-      - TAVUS_PERSONA_ID=${TAVUS_PERSONA_ID}
-      - PUBLIC_URL=${PUBLIC_URL}
-      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
