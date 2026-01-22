@@ -16,8 +16,9 @@ NC='\033[0m' # No Color
 
 # Configuration
 PROJECT_NAME="voiceai"
-PROJECT_DIR="/opt/voiceai"
-REPO_URL=""  # Will be set with token
+# Default to the current repository directory so script works when run inside the cloned repo
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="${PROJECT_DIR:-$SCRIPT_DIR}"
 BRANCH="main"
 
 #######################################
@@ -131,31 +132,6 @@ install_git() {
 # Deployment Functions
 #######################################
 
-get_git_credentials() {
-    echo ""
-    log_info "Git Repository Configuration"
-    echo "--------------------------------"
-    
-    # Get GitHub username
-    read -p "Enter GitHub username: " GITHUB_USER
-    
-    # Get GitHub token (hidden input)
-    read -s -p "Enter GitHub Personal Access Token: " GITHUB_TOKEN
-    echo ""
-    
-    # Get repository name
-    read -p "Enter repository name (e.g., username/voiceai): " REPO_NAME
-    
-    # Construct repo URL with token
-    REPO_URL="https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/${REPO_NAME}.git"
-    
-    # Get branch
-    read -p "Enter branch name [main]: " INPUT_BRANCH
-    BRANCH=${INPUT_BRANCH:-main}
-    
-    log_success "Git credentials configured"
-}
-
 setup_env_file() {
     log_info "Setting up environment variables..."
     
@@ -224,32 +200,11 @@ EOF
     log_success "Environment file created at $ENV_FILE"
 }
 
-clone_or_pull_repo() {
-    log_info "Setting up repository..."
-    
-    if [ -d "$PROJECT_DIR/.git" ]; then
-        log_info "Repository exists, pulling latest changes..."
-        cd "$PROJECT_DIR"
-        
-        # Stash any local changes
-        git stash --include-untracked 2>/dev/null || true
-        
-        # Pull latest
-        git fetch origin
-        git checkout $BRANCH
-        git pull origin $BRANCH
-        
-        log_success "Repository updated"
-    else
-        log_info "Cloning repository..."
-        sudo mkdir -p "$PROJECT_DIR"
-        sudo chown -R $USER:$USER "$PROJECT_DIR"
-        
-        git clone -b $BRANCH "$REPO_URL" "$PROJECT_DIR"
-        
-        log_success "Repository cloned"
+ensure_repo_present() {
+    if [ ! -d "$PROJECT_DIR/.git" ]; then
+        log_error "No git repository found at $PROJECT_DIR. Please clone the repo first."
+        exit 1
     fi
-    
     cd "$PROJECT_DIR"
 }
 
@@ -330,8 +285,7 @@ show_menu() {
 full_deploy() {
     install_git
     install_docker
-    get_git_credentials
-    clone_or_pull_repo
+    ensure_repo_present
     setup_env_file
     create_ssl_directory
     build_and_deploy
@@ -339,8 +293,7 @@ full_deploy() {
 }
 
 update_deploy() {
-    get_git_credentials
-    clone_or_pull_repo
+    ensure_repo_present
     build_and_deploy
     show_status
 }
