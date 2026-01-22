@@ -6,7 +6,7 @@
 
 **An intelligent voice-first appointment management system with AI video avatar powered by Tavus and Groq LLM**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://reactjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ed.svg)](https://www.docker.com/)
@@ -548,7 +548,9 @@ Contributions are welcome! Please follow these steps:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is **proprietary and confidential**. All rights reserved. See the [LICENSE](LICENSE) file for full license terms.
+
+**Usage Restrictions:** This code is provided for viewing and educational purposes only. No permission is granted for commercial, production, or business-critical use.
 
 ---
 
