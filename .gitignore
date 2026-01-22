@@ -8,6 +8,9 @@
 .env.production
 .env.*.local
 
+# Project files to exclude from repo
+prompt.txt
+
 # SSL certificates (sensitive)
 ssl/
 *.pem
