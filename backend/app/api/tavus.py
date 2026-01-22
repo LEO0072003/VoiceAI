@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import logging
 import json
+import redis
 
 from app.services import tavus_service
 from app.services.tavus_service import persona_manager
@@ -18,6 +19,22 @@ from app.services.tools import ToolExecutor
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# Redis client for distributed context storage (works across multiple workers)
+_redis_client = None
+
+def get_redis_client():
+    """Get Redis client for context storage"""
+    global _redis_client
+    if _redis_client is None:
+        try:
+            _redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+            _redis_client.ping()  # Test connection
+            logger.info(f"[TAVUS] Connected to Redis at {settings.REDIS_URL}")
+        except Exception as e:
+            logger.error(f"[TAVUS] Failed to connect to Redis: {e}")
+            _redis_client = None
+    return _redis_client
 
 
 # =============================================================================
@@ -445,29 +462,52 @@ async def get_user_history(current_user: models.User = Depends(get_current_user)
 # Tavus Tool Webhook - Receives tool calls from Tavus
 # =============================================================================
 
-# Store active conversation contexts (conversation_id -> user context)
-_conversation_contexts: Dict[str, Dict[str, Any]] = {}
+# Redis-based context storage (works across multiple workers/containers)
+CONTEXT_TTL = 3600  # 1 hour TTL for conversation context
 
 
 def store_conversation_context(conversation_id: str, user_id: int, user_name: str):
-    """Store user context for a conversation so webhook can access it"""
-    _conversation_contexts[conversation_id] = {
-        "user_id": user_id,
-        "user_name": user_name
-    }
-    logger.info(f"[TAVUS] Stored context for conversation {conversation_id}: user_id={user_id}")
+    """Store user context for a conversation in Redis so webhook can access it across workers"""
+    redis_client = get_redis_client()
+    if redis_client:
+        try:
+            context = json.dumps({
+                "user_id": user_id,
+                "user_name": user_name
+            })
+            redis_client.setex(f"tavus_context:{conversation_id}", CONTEXT_TTL, context)
+            logger.info(f"[TAVUS] Stored context in Redis for conversation {conversation_id}: user_id={user_id}")
+        except Exception as e:
+            logger.error(f"[TAVUS] Failed to store context in Redis: {e}")
+    else:
+        logger.warning(f"[TAVUS] Redis not available, context will not persist across workers")
 
 
 def get_conversation_context(conversation_id: str) -> Optional[Dict[str, Any]]:
-    """Get user context for a conversation"""
-    return _conversation_contexts.get(conversation_id)
+    """Get user context for a conversation from Redis"""
+    redis_client = get_redis_client()
+    if redis_client:
+        try:
+            context_str = redis_client.get(f"tavus_context:{conversation_id}")
+            if context_str:
+                context = json.loads(context_str)
+                logger.info(f"[TAVUS] Retrieved context from Redis for {conversation_id}: user_id={context.get('user_id')}")
+                return context
+            logger.warning(f"[TAVUS] No context found in Redis for {conversation_id}")
+        except Exception as e:
+            logger.error(f"[TAVUS] Failed to get context from Redis: {e}")
+    return None
 
 
 def clear_conversation_context(conversation_id: str):
     """Clear context when conversation ends"""
-    if conversation_id in _conversation_contexts:
-        del _conversation_contexts[conversation_id]
-        logger.info(f"[TAVUS] Cleared context for conversation {conversation_id}")
+    redis_client = get_redis_client()
+    if redis_client:
+        try:
+            redis_client.delete(f"tavus_context:{conversation_id}")
+            logger.info(f"[TAVUS] Cleared context from Redis for conversation {conversation_id}")
+        except Exception as e:
+            logger.error(f"[TAVUS] Failed to clear context from Redis: {e}")
 
 
 class TavusToolCallRequest(BaseModel):
@@ -497,11 +537,25 @@ async def tavus_tool_webhook(request: Request):
     logger.info(f"[TAVUS WEBHOOK] ========== Tool Call Received ==========")
     logger.info(f"[TAVUS WEBHOOK] Raw body: {json.dumps(body, indent=2)}")
     
+    # Check for system events that aren't tool calls
+    event_type = body.get("event_type", "")
+    message_type = body.get("message_type", "")
+    
+    # Skip system events - these are not tool calls
+    if event_type in ["system.replica_joined", "system.shutdown", "application.transcription_ready"]:
+        logger.info(f"[TAVUS WEBHOOK] Skipping system event: {event_type}")
+        return {"status": "ok", "event_type": event_type}
+    
     # Extract tool call info (Tavus format may vary)
     conversation_id = body.get("conversation_id", "")
     tool_name = body.get("tool_name") or body.get("function_name") or body.get("name", "")
     tool_call_id = body.get("tool_call_id") or body.get("id", "unknown")
     arguments = body.get("arguments") or body.get("parameters") or {}
+    
+    # If no tool name, it's not a tool call
+    if not tool_name:
+        logger.info(f"[TAVUS WEBHOOK] No tool_name in request, skipping")
+        return {"status": "ok", "message": "No tool to execute"}
     
     # If arguments is a string, parse it
     if isinstance(arguments, str):
