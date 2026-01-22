@@ -1,0 +1,44 @@
+# ===========================================
+# VoiceAI Root .gitignore
+# ===========================================
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.production
+.env.*.local
+
+# SSL certificates (sensitive)
+ssl/
+*.pem
+*.key
+*.crt
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Logs
+*.log
+logs/
+
+# Docker volumes (if mounted locally)
+postgres_data/
+redis_data/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Backup files
+*.bak
+*.backup

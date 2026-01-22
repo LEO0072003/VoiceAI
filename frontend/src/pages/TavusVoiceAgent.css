@@ -1,0 +1,428 @@
+/* Tavus Voice Agent Styles */
+
+.tavus-voice-agent {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0f0f23 100%);
+  color: white;
+}
+
+/* Header */
+.tavus-header {
+  text-align: center;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tavus-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.tavus-header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tavus-header .nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.tavus-header .nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.tavus-header .nav-link:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tavus-header .nav-link.active {
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tavus-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+/* Main Content */
+.tavus-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+/* Start Screen */
+.tavus-start-screen {
+  text-align: center;
+  max-width: 400px;
+}
+
+.tavus-avatar-placeholder {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-icon {
+  font-size: 4rem;
+  z-index: 1;
+}
+
+.avatar-glow {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  opacity: 0.3;
+  filter: blur(20px);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+.tavus-start-screen h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.tavus-start-screen p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 2rem;
+}
+
+.powered-by {
+  margin-top: 1.5rem !important;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Connecting Screen */
+.tavus-connecting {
+  text-align: center;
+}
+
+.connecting-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Active Call */
+.tavus-call-active {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tavus-iframe {
+  width: 100%;
+  height: 600px;
+  border: none;
+  border-radius: 16px;
+  background: #000;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.call-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Ended Screen */
+.tavus-ended,
+.tavus-error {
+  text-align: center;
+  max-width: 500px;
+}
+
+.ended-icon,
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.tavus-ended h2,
+.tavus-error h2 {
+  margin: 0 0 1rem;
+}
+
+.tavus-ended p,
+.tavus-error p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1.5rem;
+}
+
+.thank-you {
+  margin-top: 1.5rem !important;
+}
+
+/* Call Summary Card */
+.call-summary-card,
+.cost-breakdown-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.call-summary-card h3,
+.cost-breakdown-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  color: #667eea;
+}
+
+.summary-details p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.summary-details strong {
+  color: rgba(255, 255, 255, 0.6);
+  min-width: 80px;
+  display: inline-block;
+}
+
+/* LLM Summary Section */
+.llm-summary {
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid #667eea;
+}
+
+.llm-summary .summary-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.summary-section {
+  margin-bottom: 1rem;
+}
+
+.summary-section h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.summary-section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.summary-section li {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.25rem;
+}
+
+.session-info {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+}
+
+.session-info p {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+}
+
+/* Cost Breakdown */
+.cost-items {
+  font-size: 0.9rem;
+}
+
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cost-label {
+  flex: 1;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cost-value {
+  font-weight: 600;
+  color: #4ade80;
+  min-width: 70px;
+  text-align: right;
+}
+
+.cost-unit {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  text-align: right;
+}
+
+.cost-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0 0;
+  margin-top: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.total-value {
+  color: #4ade80;
+  font-size: 1.2rem;
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 65, 108, 0.4);
+}
+
+.btn-icon {
+  font-size: 1.2em;
+}
+
+/* Footer */
+.tavus-footer {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.features span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tavus-iframe {
+    height: 450px;
+  }
+  
+  .features {
+    gap: 1rem;
+  }
+  
+  .features span {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tavus-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .tavus-iframe {
+    height: 350px;
+    border-radius: 12px;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+}

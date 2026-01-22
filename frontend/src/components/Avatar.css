@@ -1,0 +1,184 @@
+/* Avatar Component Styles */
+.avatar-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.avatar-svg {
+  width: 160px;
+  height: 160px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+  transition: transform 0.3s ease;
+}
+
+.avatar-container:hover .avatar-svg {
+  transform: scale(1.02);
+}
+
+/* Mouth animation smoothing */
+.avatar-mouth {
+  transition: d 0.08s ease-out;
+}
+
+/* Glow effect based on state */
+.avatar-glow {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  z-index: 1;
+  transition: all 0.4s ease;
+}
+
+/* State-specific glow colors */
+.avatar-container.idle .avatar-glow {
+  background: radial-gradient(circle, rgba(100, 100, 100, 0.1) 0%, transparent 70%);
+}
+
+.avatar-container.listening .avatar-glow {
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.25) 0%, transparent 70%);
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+.avatar-container.thinking .avatar-glow {
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, transparent 70%);
+  animation: pulse-yellow 1.5s ease-in-out infinite;
+}
+
+.avatar-container.speaking .avatar-glow {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+  animation: pulse-purple 0.8s ease-in-out infinite;
+}
+
+.avatar-container.ended .avatar-glow {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+}
+
+/* Pulse animations */
+@keyframes pulse-green {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes pulse-yellow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.7; }
+}
+
+@keyframes pulse-purple {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.9; }
+}
+
+/* State ring for audio visualization */
+.state-ring {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.audio-level-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid rgba(34, 197, 94, 0.6);
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
+
+/* Status text */
+.avatar-status {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  text-align: center;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Idle breathing animation */
+.avatar-container.idle .avatar-svg {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Listening bounce */
+.avatar-container.listening .avatar-svg {
+  animation: listen-bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes listen-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Speaking animation */
+.avatar-container.speaking .avatar-svg {
+  animation: speak-bob 0.3s ease-in-out infinite;
+}
+
+@keyframes speak-bob {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+}
+
+/* Thinking animation */
+.avatar-container.thinking .avatar-svg {
+  animation: think-tilt 2s ease-in-out infinite;
+}
+
+@keyframes think-tilt {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+}
+
+/* Ended state */
+.avatar-container.ended .avatar-svg {
+  opacity: 0.8;
+  filter: grayscale(30%) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .avatar-container {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .avatar-svg {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .avatar-glow,
+  .state-ring {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .avatar-status {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+  }
+}

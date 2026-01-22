@@ -1,0 +1,104 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: voiceai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-voiceai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voiceai123}
+      POSTGRES_DB: ${POSTGRES_DB:-voiceai_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voiceai}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - voiceai-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: voiceai-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - voiceai-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: voiceai-backend
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-voiceai}:${POSTGRES_PASSWORD:-voiceai123}@postgres:5432/${POSTGRES_DB:-voiceai_db}
+      - REDIS_URL=redis://redis:6379
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - TAVUS_API_KEY=${TAVUS_API_KEY}
+      - TAVUS_REPLICA_ID=${TAVUS_REPLICA_ID}
+      - TAVUS_PERSONA_ID=${TAVUS_PERSONA_ID}
+      - PUBLIC_URL=${PUBLIC_URL}
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - voiceai-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: voiceai-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - voiceai-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: voiceai-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - voiceai-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  voiceai-network:
+    driver: bridge
